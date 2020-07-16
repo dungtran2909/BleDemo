@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -81,7 +82,9 @@ public class ScannerActivity extends AppCompatActivity {
         ItemClickListener itemClickListener = new ItemClickListener() {
             @Override
             public void onClick(int position) {
-
+                Intent intent = new Intent(ScannerActivity.this, DoBleActivity.class);
+                intent.putExtra("DEVICE", devices.get(position));
+                startActivity(intent);
             }
         };
 
