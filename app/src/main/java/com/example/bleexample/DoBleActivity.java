@@ -3,7 +3,9 @@ package com.example.bleexample;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -26,10 +28,14 @@ public class DoBleActivity extends AppCompatActivity implements ProfileDataCallb
     DiscoveredBluetoothDevice device;
     MyRePo myRePo = new MyRePo();
 
+    Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_do_ble);
+
+        context = getApplicationContext();
 
         Intent intent = getIntent();
         device = intent.getParcelableExtra("DEVICE");
@@ -49,7 +55,7 @@ public class DoBleActivity extends AppCompatActivity implements ProfileDataCallb
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                myRePo.connect(device);
+                myRePo.connect(device, context);
             }
         });
     }

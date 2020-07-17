@@ -19,12 +19,12 @@ public class MyRePo {
     public MyRePo() {
     }
 
-    public void connect(DiscoveredBluetoothDevice target){
+    public void connect(DiscoveredBluetoothDevice target, Context context){
         if (device == null){
             device = target.getDevice();
-//            final LogSession logSession = Logger
-//                    .newSession(context, null, target.getAddress(), target.getName());
-//            myBleManager.setLogSession(logSession);
+            final LogSession logSession = Logger
+                    .newSession(context, null, target.getAddress(), target.getName());
+            myBleManager.setLogSession(logSession);
             reconnect();
         }
     }
