@@ -20,22 +20,20 @@ import com.example.bleexample.model.DiscoveredBluetoothDevice;
 import no.nordicsemi.android.ble.callback.profile.ProfileDataCallback;
 import no.nordicsemi.android.ble.data.Data;
 
-public class DoBleActivity extends AppCompatActivity implements ProfileDataCallback {
+public class DoBleActivity extends AppCompatActivity {
     EditText edtmMes;
-    Button btn_send, btnBack;
+    Button btn_send, btnBack,btn_check;
     TextView txtNameDevice, txtAddressDevice, txtMes;
+
+    public static String textIn = "";
 
     DiscoveredBluetoothDevice device;
     MyRePo myRePo = new MyRePo();
-
-    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_do_ble);
-
-        context = getApplicationContext();
 
         Intent intent = getIntent();
         device = intent.getParcelableExtra("DEVICE");
@@ -55,7 +53,14 @@ public class DoBleActivity extends AppCompatActivity implements ProfileDataCallb
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                myRePo.connect(device, context);
+                myRePo.connect(device, DoBleActivity.this);
+            }
+        });
+
+        btn_check.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(DoBleActivity.this, textIn, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -65,6 +70,7 @@ public class DoBleActivity extends AppCompatActivity implements ProfileDataCallb
         txtMes = findViewById(R.id.txtMes);
         btn_send = findViewById(R.id.btn_send);
         btnBack = findViewById(R.id.btnBack);
+        btn_check = findViewById(R.id.btn_check);
         txtNameDevice = findViewById(R.id.txtNameDevice);
         txtAddressDevice = findViewById(R.id.txtAddressDevice);
 
@@ -76,13 +82,4 @@ public class DoBleActivity extends AppCompatActivity implements ProfileDataCallb
         txtAddressDevice.setText(device.getDevice().getAddress());
     }
 
-    @Override
-    public void onDataReceived(@NonNull BluetoothDevice device, @NonNull Data data) {
-
-    }
-
-    @Override
-    public void onInvalidDataReceived(@NonNull BluetoothDevice device, @NonNull Data data) {
-
-    }
 }
