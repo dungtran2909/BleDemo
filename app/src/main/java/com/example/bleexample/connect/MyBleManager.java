@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import com.example.bleexample.DoBleActivity;
 import com.example.bleexample.callback.TextInCallback;
 import com.example.bleexample.callback.TextInDataCallback;
+import com.example.bleexample.callback.TextOutCallback;
+import com.example.bleexample.callback.TextOutDataCallback;
 
 import java.util.UUID;
 
@@ -38,6 +40,17 @@ public class MyBleManager extends BleManager {
     private LogSession logSession;
     private boolean supported;
 
+    TextOutCallback textOutCallback;
+
+    public void setTextOutCallback(TextOutCallback textOutCallback) {
+        this.textOutCallback = textOutCallback;
+    }
+
+    public MyBleManager(@NonNull Context context, TextOutCallback textOutCallback) {
+        super(context);
+        this.textOutCallback = textOutCallback;
+    }
+
     public MyBleManager(@NonNull Context context) {
         super(context);
     }
@@ -60,12 +73,33 @@ public class MyBleManager extends BleManager {
     private TextInDataCallback textInDataCallback = new TextInDataCallback() {
         @Override
         public void onTextInChanged(BluetoothDevice device, String text) {
-            DoBleActivity.textIn = text;
+//            DoBleActivity.textIn = text;
         }
 
         @Override
         public void onInvalidDataReceived(@NonNull BluetoothDevice device, @NonNull Data data) {
             log(Log.WARN, "Invalid data received: " + data);
+        }
+
+        @Override
+        public void onDataSent(@NonNull BluetoothDevice device, @NonNull Data data) {
+//            DoBleActivity.textIn = data.getStringValue(0);
+            Log.d("SEND", "send message");
+            super.onDataSent(device, data);
+        }
+    };
+
+    private TextOutDataCallback textOutDataCallback = new TextOutDataCallback() {
+        @Override
+        public void onTextOutChanged(BluetoothDevice device, String text) {
+
+        }
+
+        @Override
+        public void onDataReceived(@NonNull BluetoothDevice device, @NonNull Data data) {
+            Log.d("READ", "read message");
+            DoBleActivity.textIn = data.getStringValue(0);
+
         }
     };
 
@@ -76,10 +110,6 @@ public class MyBleManager extends BleManager {
             if (service != null){
                 textInCharacteristic = service.getCharacteristic(BLE_UUID_TEXT_IN);
                 textOutCharacteristic = service.getCharacteristic(BLE_UUID_TEXT_OUT);
-            }
-
-            for (int i = 0; i < service.getCharacteristics().size(); i ++){
-                Log.d("CHECK_MORE", service.getCharacteristics().get(i).getUuid()+"");
             }
 
             boolean writerequest = false;
@@ -100,10 +130,10 @@ public class MyBleManager extends BleManager {
 
         @Override
         protected void initialize() {
-//            setNotificationCallback(textInCharacteristic).with(textInDataCallback);
-            writeCharacteristic(textInCharacteristic, "Hello World!".getBytes()).enqueue();
-            readCharacteristic(textInCharacteristic).with(textInDataCallback).enqueue();
-            enableNotifications(textInCharacteristic).enqueue();
+            setNotificationCallback(textOutCharacteristic).with(textOutDataCallback);
+//            writeCharacteristic(textInCharacteristic, "dungtran".getBytes()).with(textInDataCallback).enqueue();
+            readCharacteristic(textOutCharacteristic).with(textInDataCallback).enqueue();
+            enableNotifications(textOutCharacteristic).enqueue();
 
             Log.d("CHECK", textInCharacteristic.getValue()+"");
         }
@@ -115,42 +145,11 @@ public class MyBleManager extends BleManager {
         }
     }
 
-//    private final DeviceDataCallback mDeviceDataCallback = new DeviceDataCallback() {
-//        @Override
-//        public void onDataReceived(@NonNull BluetoothDevice device, @NonNull Data data) {
-//            toast("onDataReceived: " + new String(data.getValue()));
-//        }
-//
-//        @Override
-//        public void onDataSent(@NonNull BluetoothDevice device, @NonNull Data data) {
-//            toast("onDataSent: " + new String(data.getValue()));
-//        }
-//
-//        @Override
-//        public void onInvalidDataReceived(@NonNull BluetoothDevice device, @NonNull Data data) {
-//            toast("onInvalidDataReceived: " + new String(data.getValue()));
-//        }
-//    };
-
-//    private abstract class DataCallbaclk implements ProfileDataCallback {
-//        @Override
-//        public void onDataReceived(@NonNull BluetoothDevice device, @NonNull Data data) {
-//            if (data.size() != 1) {
-//                onInvalidDataReceived(device, data);
-//                return;
-//            }
-//        }
-//        abstract void onFluxCapacitorEngaged(){
-//            void onTextOutChanged( device,  text);
-//        }
-//
-//    }
-//
-//    DataCallbaclk dataCallbaclk = new DataCallbaclk() {
-//        @Override
-//        void onFluxCapacitorEngaged() {
-//
-//        }
-//    };
-
+    public void sendText(String textIn){
+        if (textInCharacteristic == null){
+            return;
+        }
+        writeCharacteristic(textInCharacteristic, textIn.getBytes()).with(textInDataCallback).enqueue();
+        readCharacteristic(textOutCharacteristic).with(textOutDataCallback).enqueue();
+    }
 }

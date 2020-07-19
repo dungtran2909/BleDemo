@@ -6,6 +6,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.example.bleexample.callback.TextOutCallback;
 import com.example.bleexample.model.DiscoveredBluetoothDevice;
 
 import no.nordicsemi.android.ble.observer.ConnectionObserver;
@@ -19,7 +20,7 @@ public class MyRePo implements ConnectionObserver {
     public MyRePo() {
     }
 
-//    public MyRePo(@NonNull final Application application) {
+    //    public MyRePo(@NonNull final Application application) {
 //        super(application);
 //
 //        // Initialize the manager.
@@ -46,9 +47,13 @@ public class MyRePo implements ConnectionObserver {
         }
     }
 
-    private void disconnect(){
+    public void disconnect(){
         device = null;
         myBleManager.disconnect().enqueue();
+    }
+
+    public void sendTextIn(String textIn){
+        myBleManager.sendText(textIn);
     }
 
     @Override

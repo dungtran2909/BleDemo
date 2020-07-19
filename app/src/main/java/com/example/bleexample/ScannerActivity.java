@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.AppComponentFactory;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -37,6 +38,10 @@ public class ScannerActivity extends AppCompatActivity {
     RecyclerView rcl_scanner;
     ArrayList<DiscoveredBluetoothDevice> devices = new ArrayList<>();
     ScannerAdapter scannerAdapter;
+
+    public ScannerActivity() {
+    }
+
     private int REQUEST_LOCATION_ENABLE_CODE = 1022;
 
 
@@ -116,7 +121,7 @@ public class ScannerActivity extends AppCompatActivity {
         scanner.startScan(null, settings, scanCallback);
     }
 
-    private void stopScan(){
+    public void stopScan(){
         if (!mScanning)
             return;
 
@@ -124,7 +129,6 @@ public class ScannerActivity extends AppCompatActivity {
         scanner.stopScan(scanCallback);
         mHandler.removeCallbacks(mStopScanTask);
         mScanning = false;
-
     }
 
     private Runnable mStopScanTask = new Runnable() {

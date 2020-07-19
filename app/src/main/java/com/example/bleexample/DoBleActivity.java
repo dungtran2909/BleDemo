@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.bleexample.callback.TextOutCallback;
+import com.example.bleexample.connect.MyBleManager;
 import com.example.bleexample.connect.MyRePo;
 import com.example.bleexample.model.DiscoveredBluetoothDevice;
 
@@ -22,13 +24,18 @@ import no.nordicsemi.android.ble.data.Data;
 
 public class DoBleActivity extends AppCompatActivity {
     EditText edtmMes;
-    Button btn_send, btnBack,btn_check;
+    Button btn_send, btnBack, btn_check;
     TextView txtNameDevice, txtAddressDevice, txtMes;
 
     public static String textIn = "";
 
+    MyBleManager myBleManager;
+
     DiscoveredBluetoothDevice device;
     MyRePo myRePo = new MyRePo();
+
+    ScannerActivity scannerActivity = new ScannerActivity();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +44,8 @@ public class DoBleActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         device = intent.getParcelableExtra("DEVICE");
+
+        myRePo.connect(device, DoBleActivity.this);
 
         addControls();
         addEvents();
@@ -53,14 +62,25 @@ public class DoBleActivity extends AppCompatActivity {
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                myRePo.connect(device, DoBleActivity.this);
+                myRePo.sendTextIn(edtmMes.getText().toString());
+
+                TextOutCallback textOutCallback = new TextOutCallback() {
+                    @Override
+                    public void onTextOutChanged(BluetoothDevice device, String text) {
+                        txtMes.setText(text);
+                    }
+                };
+
+                myBleManager = new MyBleManager(DoBleActivity.this, textOutCallback);
+
+//                txtMes.setText(textIn);
             }
         });
 
         btn_check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(DoBleActivity.this, textIn, Toast.LENGTH_SHORT).show();
+                scannerActivity.stopScan();
             }
         });
     }
@@ -74,9 +94,9 @@ public class DoBleActivity extends AppCompatActivity {
         txtNameDevice = findViewById(R.id.txtNameDevice);
         txtAddressDevice = findViewById(R.id.txtAddressDevice);
 
-        if (device.getDevice().getName() == null){
+        if (device.getDevice().getName() == null) {
             txtNameDevice.setText("Unhnown Device");
-        }else{
+        } else {
             txtNameDevice.setText(device.getDevice().getName());
         }
         txtAddressDevice.setText(device.getDevice().getAddress());

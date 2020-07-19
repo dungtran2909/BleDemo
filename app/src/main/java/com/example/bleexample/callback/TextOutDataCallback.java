@@ -29,7 +29,7 @@ import androidx.annotation.NonNull;
 import no.nordicsemi.android.ble.callback.profile.ProfileDataCallback;
 import no.nordicsemi.android.ble.data.Data;
 
-public abstract class TextOutDataCallback implements ProfileDataCallback, TextInCallback {
+public abstract class TextOutDataCallback implements ProfileDataCallback, TextOutCallback {
     @Override
     public void onDataReceived(@NonNull BluetoothDevice device, @NonNull Data data) {
         if (data.size() != 1) {
@@ -37,6 +37,5 @@ public abstract class TextOutDataCallback implements ProfileDataCallback, TextIn
             return;
         }
     }
-
 
 }
